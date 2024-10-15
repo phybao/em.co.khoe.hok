@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday</title>
+    <style>
+        @font-face {
+            font-family: 'Westonia';
+            src: url('fonts/Westonia-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Candle Stick */
+        .candle-stick {
+            position: absolute;
+            left: 32vw;
+            bottom: -10vh;
+            height: 50vh;
+            width: 1vw;
+            background: linear-gradient(to bottom, #6f675c, black 80%),
+                        linear-gradient(to right, rgba(111, 103, 92, 0.3), rgba(111, 103, 92, 0.1));
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+        /* Extended sparkle duration and scaling */
+        .sparkle {
+            position: absolute;
+            width: 0.5vw;
+            height: 0.5vw;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.9), rgba(238, 191, 44, 0.7));
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle 2.0s forwards ease-out;
+        }
+
+        @keyframes sparkle {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        /* Fire Effect */
+        .fire {
+            position: absolute;
+            width: 20px;
+            height: 35px;
+            background: radial-gradient(closest-side, rgba(255, 165, 0, 1), rgba(255, 69, 0, 0.8));
+            border-radius: 50%;
+            animation: flicker 1.73s infinite;
+            z-index: 2;
+            pointer-events: none;
+            transform: translate(-50%, -100%);
+        }
+
+        @keyframes flicker {
+            0%, 100% {
+                transform: scale(1) translateY(0);
+                opacity: 0.9;
+            }
+            50% {
+                transform: scale(1.2) translateY(-5px);
+                opacity: 1;
+            }
+        }
+
+        /* Shrink and fade out effect */
+        @keyframes shrink {
+            0% {
+                transform: scale(1) translateY(0);
+                opacity: 0.9;
+            }
+	    100% {
+                transform: scale(0) translateY(-5px);
+                opacity: 0;
+            }
+        }
+
+        /* Body Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #0b0b0d;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .birthday-text {
+            font-family: 'Westonia', cursive;
+            font-size: 10vw;
+            color: #d269e6;
+            margin-right: 24vw;
+            text-align: middle;
+            text-shadow: 0 1px 2px rgba(210, 105, 230, 0.9),
+                         0 2px 4px rgba(210, 105, 230, 0.7),
+                         0 5px 10px rgba(210, 105, 230, 0.5),
+                         0 10px 20px rgba(210, 105, 230, 0.3),
+                         0 15px 30px rgba(210, 105, 230, 0.2),
+                         0 20px 40px rgba(210, 105, 230, 0.1);
+            animation: glow 2s ease-in-out infinite alternate;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .name {
+            text-transform: none;
+        }
+
+        @keyframes glow {
+            50% {
+                text-shadow: 0 3px 5px rgba(210, 105, 230, 0.9),
+                             0 5px 10px rgba(210, 105, 230, 0.8),
+                             0 10px 20px rgba(210, 105, 230, 0.6),
+                             0 15px 30px rgba(210, 105, 230, 0.4),
+                             0 20px 40px rgba(210, 105, 230, 0.3),
+                             0 25px 50px rgba(210, 105, 230, 0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="candle-stick"></div>
+
+    <div class="birthday-text">
+        <span>happy birthday,</span><br>
+        <span class="name">dear NhatLinh</span>
+    </div>
+
+    <!-- Audio element for the birthday song -->
+    <audio id="birthdaySong" src="birthdaySong.mp3"></audio>
+
+    <script>
+        const candleStick = document.querySelector('.candle-stick');
+        const birthdaySong = document.getElementById('birthdaySong');
+        let isMouseDown = false;
+        let songPlaying = false; // Track if the song is currently playing
+
+        // Adjust candle stick position based on window size
+        function adjustCandleStick() {
+            const windowHeight = window.innerHeight;
+            const stickHeight = candleStick.clientHeight;
+            const topPosition = windowHeight - stickHeight;
+            candleStick.style.top = `${topPosition}px`;
+        }
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+
+            const randomX = Math.random() * 30 - 15;
+            const randomY = Math.random() * 30 - 15;
+            sparkle.style.left = `${x + randomX}px`;
+            sparkle.style.top = `${y + randomY}px`;
+            document.body.appendChild(sparkle);
+            sparkle.addEventListener('animationend', () => sparkle.remove());
+        }
+
+        function showFire() {
+            const fire = document.createElement('div');
+            fire.className = 'fire';
+
+            const candleRect = candleStick.getBoundingClientRect();
+            const topX = candleRect.left + candleRect.width / 2;
+            const topY = candleRect.top;
+
+            fire.style.left = `${topX - 10}px`;
+            fire.style.top = `${topY - 44}px`;
+
+            document.body.appendChild(fire);
+
+            // Play the song if it's not already playing
+            if (!songPlaying) {
+                birthdaySong.play();
+                songPlaying = true;
+            }
+        }
+
+        // Apply shrinking animation to all fire elements
+        function shrinkFireElements() {
+            const fireElements = document.querySelectorAll('.fire');
+            fireElements.forEach(fire => {
+                fire.style.animation = 'shrink 1.5s forwards'; // Shrink over 2 seconds
+                fire.addEventListener('animationend', () => fire.remove()); // Remove fire after shrinking
+            });
+        }
+
+        candleStick.addEventListener('mousedown', () => {
+            isMouseDown = true;
+            const topX = candleStick.offsetLeft + candleStick.offsetWidth / 2;
+            const topY = candleStick.offsetTop;
+
+            let sparkleInterval = setInterval(() => {
+                if (!isMouseDown) {
+                    clearInterval(sparkleInterval);
+                    showFire(topX, topY);
+                } else {
+                    createSparkle(topX, topY);
+                }
+            }, 50);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            createSparkle(e.pageX, e.pageY);
+        });
+
+        document.addEventListener('mouseup', () => {
+            isMouseDown = false;
+        });
+
+        window.addEventListener('resize', () => {
+            shrinkFireElements(); // Shrink fires when resizing
+            adjustCandleStick();
+        });
+
+        // Shrink all fire elements when the song ends
+        birthdaySong.addEventListener('ended', () => {
+            shrinkFireElements();
+            songPlaying = false;
+        });
+
+        adjustCandleStick();
+    </script>
+</body>
+</html>
